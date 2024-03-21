@@ -2,17 +2,19 @@ import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import {
   FormBuilder,
-  FormControl,
   FormGroup,
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
 import ValidateForm from '../../helpers/validateform';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { NgToastService } from 'ng-angular-popup';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [ReactiveFormsModule, CommonModule],
+  imports: [ReactiveFormsModule, CommonModule, HttpClientModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.scss',
 })
@@ -22,7 +24,7 @@ export class LoginComponent implements OnInit {
   eyeIcon: string = 'fa-eye-slash';
 
   loginForm!: FormGroup;
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private rout: Router, private toast: NgToastService) {}
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -37,9 +39,18 @@ export class LoginComponent implements OnInit {
     this.isText ? (this.type = 'text') : (this.type = 'password');
   }
 
-  onSubmit() {
+  onLogin() {
     if (this.loginForm.valid) {
-      console.log(this.loginForm.value);
+      this.http.post('https://localhost:7060/api/Login/authenticate', this.loginForm.value).subscribe({
+        next: (res) => {
+          this.loginForm.reset();
+          this.toast.success({detail: "SUCCESS", summary: "Login Successful!", duration: 5000});
+          this.rout.navigate(['dashboard']);
+        },
+        error: (err) => {
+          this.toast.error({detail: "ERROR", summary: err?.error.message, duration: 5000});
+        },
+      });
     } else {
       ValidateForm.validateAllFormsFields(this.loginForm);
     }

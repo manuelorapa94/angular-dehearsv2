@@ -5,6 +5,7 @@
         <div class="panel border bg-white">
           <div class="panel-heading">
             <h3 class="pt-3 font-weight-bold">Sign Up</h3>
+            <h4 class="pt-3 font-weight-bold">DAVNOR Electronic Health Referral System</h4>
           </div>
           <div class="panel-body p-3">
             <form [formGroup]="signupForm">
@@ -133,7 +134,7 @@
                 >* Password is required</small
               >
               <button
-                (click)="onSubmit()"
+                (click)="onSignUp()"
                 type="submit"
                 class="btn btn-primary btn-block mt-4 w-100"
               >
@@ -141,7 +142,7 @@
               </button>
               <div class="text-center pt-4 text-muted">
                 Already have account?
-                <a href="/" id="forget" class="font-weight-bold">Log In</a>
+                <a href="/login" id="forget" class="font-weight-bold">Log In</a>
               </div>
             </form>
           </div>
