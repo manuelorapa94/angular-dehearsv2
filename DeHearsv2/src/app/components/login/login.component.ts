@@ -11,6 +11,11 @@ import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { NgToastService } from 'ng-angular-popup';
 
+interface LoginResponse {
+  token: string;
+  message: string;
+}
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -24,7 +29,7 @@ export class LoginComponent implements OnInit {
   eyeIcon: string = 'fa-eye-slash';
 
   loginForm!: FormGroup;
-  constructor(private fb: FormBuilder, private http: HttpClient, private rout: Router, private toast: NgToastService) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private rout: Router, private toast: NgToastService) { }
 
   ngOnInit(): void {
     this.loginForm = this.fb.group({
@@ -41,10 +46,11 @@ export class LoginComponent implements OnInit {
 
   onLogin() {
     if (this.loginForm.valid) {
-      this.http.post('https://localhost:7060/api/Login/authenticate', this.loginForm.value).subscribe({
+      this.http.post<LoginResponse>('https://localhost:7060/api/Login/authenticate', this.loginForm.value).subscribe({
         next: (res) => {
           this.loginForm.reset();
-          this.toast.success({detail: "SUCCESS", summary: "Login Successful!", duration: 5000});
+          this.storeToken(res.token);
+          this.toast.success({detail: "SUCCESS", summary: res.message, duration: 5000});
           this.rout.navigate(['dashboard']);
         },
         error: (err) => {
@@ -54,5 +60,17 @@ export class LoginComponent implements OnInit {
     } else {
       ValidateForm.validateAllFormsFields(this.loginForm);
     }
+  }
+
+  storeToken(tokenValue: string){
+    localStorage.setItem('token', tokenValue);
+  }
+
+  getToken(){
+    return localStorage.getItem('token')
+  }
+
+  isLoggedIn(): boolean{
+    return !!localStorage.getItem('token');
   }
 }
