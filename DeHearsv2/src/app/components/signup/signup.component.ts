@@ -9,6 +9,7 @@ import {
 import ValidateForm from '../../helpers/validateform';
 import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { NgToastService } from 'ng-angular-popup';
 
 @Component({
   selector: 'app-signup',
@@ -23,7 +24,7 @@ export class SignupComponent implements OnInit {
   eyeIcon: string = 'fa-eye-slash';
 
   signupForm!: FormGroup;
-  constructor(private fb: FormBuilder, private http: HttpClient, private rout: Router) {}
+  constructor(private fb: FormBuilder, private http: HttpClient, private rout: Router, private toast: NgToastService) {}
 
   ngOnInit(): void {
     this.signupForm = this.fb.group({
@@ -46,11 +47,11 @@ export class SignupComponent implements OnInit {
       this.http.post('https://localhost:7060/api/User', this.signupForm.value).subscribe({
         next: (res) => {
           this.signupForm.reset();
+          this.toast.success({detail: "SUCCESS", summary: "Sign Up Successful!", duration: 5000});
           this.rout.navigate(['login']);
         },
         error: (err) => {
-          alert(err?.error.message);
-          console.log(err);
+          this.toast.error({detail: "ERROR", summary: err?.error.message, duration: 5000});
         },
       });
     } else {
